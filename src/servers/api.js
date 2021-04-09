@@ -4,6 +4,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import glob from 'glob';
 
 import database from '../database/connection';
 import routes from './routes/api';
@@ -25,9 +26,6 @@ const { PORT } = process.env;
 	}
 })();
 
-const userId = process.argv[3];
-console.log({ userId });
-
 const startServer = () => {
 	const app = express();
 	app.use(cors());
@@ -40,36 +38,25 @@ const startServer = () => {
 
 	app.use('/', routes);
 
-	if (userId) {
-		setInterval(async () => {
-			const server = await serverRepository.first({ user_id: userId });
-			if (server) {
-				await serverRepository
-					.updateInstance(server, {
-						status: 'disconnected',
-					})
-					.catch((e) => e);
-			}
-			process.exit(0);
-		}, 2000);
-	}
-
-	const _PORT = process.argv[2] ?? (PORT || 3000);
+	const _PORT = PORT || 3000;
 	app.listen(_PORT, () => {
 		console.log(`Server is listening to port ${_PORT}`);
 	});
 };
 
-const registerAppServiceEvents = (appEventContext) => {
-	const servicesDirectory = __dirname + '/../services';
-	fs.readdirSync(servicesDirectory)
-		.filter((fileName) => {
-			return fileName.indexOf('.') !== 0 && fileName.slice(-3) === '.js' && fileName !== 'index.js';
-		})
-		.forEach((fileName) => {
-			const service = require(path.join(servicesDirectory, fileName));
-			if (typeof service === 'function') service(appEventContext);
-		});
+const registerAppServiceEvents = appEventContext => {
+	const servicesDirectory = __dirname + '/../services/';
+	glob(servicesDirectory + '/**/*.js', function(err, files) {
+		if (err) throw err;
+		files
+			.filter(fileName => {
+				return fileName.indexOf('.') !== 0 && fileName.slice(-3) === '.js' && fileName !== 'index.js';
+			})
+			.forEach(fileName => {
+				const service = require(path.join(fileName));
+				if (typeof service === 'function') service(appEventContext);
+			});
+	});
 };
 
 (async () => {

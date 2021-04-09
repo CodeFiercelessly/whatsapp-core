@@ -5,8 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"start": "babel-node -- ./src/servers/api.js",
-		"start:connection": "babel-node -- ./src/servers/api.js ${port} ${userId}",
-		"start:dev": "nodemon --exec babel-node -- ./src/servers/api.js",
+		"dev": "nodemon --exec babel-node -- ./src/servers/api.js",
 		"prettier": "prettier --write 'src/**/*.{ts,js}'",
 		"lint": "eslint ./src",
 		"lint:fix": "./node_modules/.bin/eslint --ignore-path .gitignore . --fix"

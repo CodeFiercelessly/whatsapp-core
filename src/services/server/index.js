@@ -1,6 +1,7 @@
 import initiateUserConnection from './initiateUserConnection';
 import startUserConnection from './startUserConnection';
 import createUserConnectionObject from './createUserConnectionObject';
+import deployConnection from './deployConnection';
 
 module.exports = (appEventContext = null) => {
 	if (appEventContext) {
@@ -13,5 +14,6 @@ module.exports = (appEventContext = null) => {
 		appEventContext.on('initiateUserWhatsAppServerConnection', (...args) =>
 			initiateUserConnection({ appEventContext }, ...args),
 		);
+		appEventContext.on('deployWhatsAppServerConnection', (...args) => deployConnection({ appEventContext }, ...args));
 	}
 };
